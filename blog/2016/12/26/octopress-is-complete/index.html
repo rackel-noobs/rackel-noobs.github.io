@@ -5,12 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Octopress Is Complete - My Octopress Blog</title>
-  <meta name="author" content="Your Name">
+  <title>Write Up (3DSCTF) 2016 : Hot Sun ? - Rackel-noobs Labs</title>
+  <meta name="author" content="Rackel">
 
   
-  <meta name="description" content="
-">
+  <meta name="description" content="Soal: Surfing in the Shallowweb, we have discovered a new algorithm that promises to be the newest substituition cipher. The algorithm to encrypt &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -22,7 +21,7 @@
   <link rel="canonical" href="http://rackel-noobs.github.io/blog/2016/12/26/octopress-is-complete/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
+  <link href="/atom.xml" rel="alternate" title="Rackel-noobs Labs" type="application/atom+xml">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
@@ -37,9 +36,9 @@
 
 <body   >
   <header role="banner"><hgroup>
-  <h1><a href="/">My Octopress Blog</a></h1>
+  <h1><a href="/">Rackel-noobs Labs</a></h1>
   
-    <h2>A blogging framework for hackers.</h2>
+    <h2>Everything on my mind</h2>
   
 </hgroup>
 
@@ -69,7 +68,7 @@
   
   <header>
     
-      <h1 class="entry-title">Octopress Is Complete</h1>
+      <h1 class="entry-title">Write Up (3DSCTF) 2016 : Hot Sun ?</h1>
     
     
       <p class="meta">
@@ -85,7 +84,21 @@
   </header>
 
 
-<div class="entry-content">
+<div class="entry-content"><h3>Soal:</h3>
+
+<blockquote><p>Surfing in the Shallowweb, we have discovered a new algorithm that promises to be the newest substituition cipher. The algorithm to encrypt works as following: the user informs the text to be encrypted and a number N. Initially, the algorithm shift all letters one position to the right (e.g. ‘A’ tuns into ‘B’). With this result, in the next step, the algorithm now shift the text two positions to the right. And with the text from the previous output, it repeats the shift procedure until N. Your task is quite simple: given an encrypted flag and an N number, discover the flag. Encrypted flag: 3RG{hv1g_f0h_1g_b0h_g0_V0h} N: 11</p></blockquote>
+
+
+<h3>Kategori : Crypto</h3>
+
+<h3>Solusi :</h3>
+
+<p>Kita diberi hint yang sangat jelas dibaris ke 2 dari atas yang berbunyi substituition cipher Maka dari itu sangat jelas soal ini tentang ciphertext model caesar dengan metode subtitusi.
+Dan encrypted flag yang diberikan tidak dapat kita pahami sebelum kita mengubahnya menjadi plaintext yang dapat dibaca dan dipahami maksudnya.
+Maka dari itu kita harus mendecrypt ciphertext tersebut mulai dari key 1, 2, 3, 4, 5, 6 …. dan seterusnya sampai dapat dibaca dan dipahami tulisannya.
+Setelah mengurutkan dari 1 , ternyata ditemukan flagnya di key ke 12 . Lihat output hasil decrypt</p>
+
+<p><img class="center" src="/images/ss1.png" width="450" height="500" title="'writeup'" ></p>
 </div>
 
 
@@ -94,7 +107,7 @@
       
   
 
-<span class="byline author vcard">Posted by <span class="fn">Your Name</span></span>
+<span class="byline author vcard">Posted by <span class="fn">Rackel</span></span>
 
       
 
@@ -103,6 +116,12 @@
 
 <time class='entry-date' datetime='2016-12-26T17:14:22+07:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>26</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>5:14 pm</span></time>
       
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/writeup/'>writeup</a>
+  
+</span>
 
 
     </p>
@@ -132,7 +151,7 @@
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2016/12/26/octopress-is-complete/">Octopress Is Complete</a>
+        <a href="/blog/2016/12/26/octopress-is-complete/">Write Up (3DSCTF) 2016 : Hot Sun ?</a>
       </li>
     
   </ul>
@@ -149,7 +168,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2016 - Your Name -
+  Copyright &copy; 2016 - Rackel -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

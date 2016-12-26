@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Rackel-noobs Labs]]></title>
-  <link href="http://rackel-noobs.github.io/atom.xml" rel="self"/>
+  <title><![CDATA[Category: Writeup | Rackel-noobs Labs]]></title>
+  <link href="http://rackel-noobs.github.io/blog/categories/writeup/atom.xml" rel="self"/>
   <link href="http://rackel-noobs.github.io/"/>
   <updated>2016-12-26T19:15:22+07:00</updated>
   <id>http://rackel-noobs.github.io/</id>
@@ -20,8 +20,7 @@
     <id>http://rackel-noobs.github.io/blog/2016/12/26/octopress-is-complete</id>
     <content type="html"><![CDATA[<h3>Soal:</h3>
 
-<blockquote><p>Surfing in the Shallowweb, we have discovered a new algorithm that promises to be the newest substituition cipher. The algorithm to encrypt works as following: the user informs the text to be encrypted and a number N. Initially, the algorithm shift all letters one position to the right (e.g. ‘A’ tuns into ‘B’). With this result, in the next step, the algorithm now shift the text two positions to the right. And with the text from the previous output, it repeats the shift procedure until N. Your task is quite simple: given an encrypted flag and an N number, discover the flag. Encrypted flag: 3RG{hv1g_f0h_1g_b0h_g0_V0h} N: 11</p></blockquote>
-
+<p><blockquote><p>Surfing in the Shallowweb, we have discovered a new algorithm that promises to be the newest substituition cipher. The algorithm to encrypt works as following: the user informs the text to be encrypted and a number N. Initially, the algorithm shift all letters one position to the right (e.g. ‘A’ tuns into ‘B’). With this result, in the next step, the algorithm now shift the text two positions to the right. And with the text from the previous output, it repeats the shift procedure until N. Your task is quite simple: given an encrypted flag and an N number, discover the flag. Encrypted flag: 3RG{hv1g_f0h_1g_b0h_g0_V0h} N: 11</p></blockquote></p>
 
 <h3>Kategori : Crypto</h3>
 
@@ -32,7 +31,7 @@ Dan encrypted flag yang diberikan tidak dapat kita pahami sebelum kita mengubahn
 Maka dari itu kita harus mendecrypt ciphertext tersebut mulai dari key 1, 2, 3, 4, 5, 6 …. dan seterusnya sampai dapat dibaca dan dipahami tulisannya.
 Setelah mengurutkan dari 1 , ternyata ditemukan flagnya di key ke 12 . Lihat output hasil decrypt</p>
 
-<p><img class="center" src="http://rackel-noobs.github.io/images/ss1.png" width="450" height="500" title="'writeup'" ></p>
+<p><img class="center" src="/images/ss1.png" width="450" height="500" title="&lsquo;writeup&rsquo;" ></p>
 ]]></content>
   </entry>
   
