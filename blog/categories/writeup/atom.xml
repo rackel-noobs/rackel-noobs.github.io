@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Writeup | Rackel-noobs Labs]]></title>
   <link href="http://rackel-noobs.github.io/blog/categories/writeup/atom.xml" rel="self"/>
   <link href="http://rackel-noobs.github.io/"/>
-  <updated>2016-12-26T20:00:33+07:00</updated>
+  <updated>2016-12-30T08:15:02+07:00</updated>
   <id>http://rackel-noobs.github.io/</id>
   <author>
     <name><![CDATA[Rackel]]></name>
@@ -12,6 +12,209 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Write Up 33C3 CTF : Exfill]]></title>
+    <link href="http://rackel-noobs.github.io/blog/2016/12/30/write-up-33c3-ctf-exfill/"/>
+    <updated>2016-12-30T07:21:45+07:00</updated>
+    <id>http://rackel-noobs.github.io/blog/2016/12/30/write-up-33c3-ctf-exfill</id>
+    <content type="html"><![CDATA[<h3>Soal :</h3>
+
+<blockquote><p>ired somebody to gather intelligence on an enemy party. But apparently they managed to lose the secret document they extracted. They just sent us this and said we should be able to recover everything we need from it.
+Can you help?</p></blockquote>
+
+<h3>Solusi :</h3>
+
+<p>Di task ini kita di beri file PCAP berupa <code>dump.pcap</code> dan skrip python berupa <code>server.py</code></p>
+
+<p>File PCAP sepertinya berisi tentang percakapan antara DNS Client dan Server. Dimana DNS Query dan CNAME menunjukkan respon berupa pesan yang terencode.</p>
+
+<p><img class="center" src="/images/pcap.png" width="550" height="500"></p>
+
+<p>pemeriksaan kode server menunjukkan bahwa permintaan DNS dan respon digunakan sebagai transportasi untuk sesi remote shell. DNS Client memulai percakapan dan server merespon dengan mengirimkan perintah shell, klien kemudian mengirimkan output. Perintah dikirim dalam tanggapan CNAME untuk query DNS, sementara output dikodekan dalam nama subdomain di query DNS.</p>
+
+<p>Setiap payload dikodekan dalam Base32 dan dibagi menjadi potongan 62-karakter untuk menjelaskan panjang maksimum nama domain. Potongan dipisahkan dengan periode dan akhiran eat-sleep-pwn-repeat.de</p>
+
+<blockquote><p>G4JQAAADAB2WSZB5GEYDAMJIMZYGK5DSPEUSAZ3JMQ6TCMBQGEUGM4DFORZHSK"JAM5ZG65LQOM6TCMBQGEUGM4DFORZHSKIKeat-sleep-pwn-repeatde</p></blockquote>
+
+<p>Berdasarkan informasi yang dikumpulkan sejauh ini kita harus membuat script. Script ini akan melalui semua paket dalam file PCAP, mengekstraknya dan mendecode payloads, membuang paket duplikat, dan menampilkan output ke layar:</p>
+
+<p><figure class='code'><figcaption><span>Time to Decode - decode.py </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+</pre></td><td class='code'><pre><code class='py'><span class='line'><span class="kn">import</span> <span class="nn">base64</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">struct</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">dpkt</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">sys</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">sseq</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+</span><span class='line'><span class="n">dseq</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">def</span> <span class="nf">decode_b32</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+</span><span class='line'>    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+</span><span class='line'>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+</span><span class='line'>        <span class="k">try</span><span class="p">:</span>
+</span><span class='line'>            <span class="k">return</span> <span class="n">base64</span><span class="o">.</span><span class="n">b32decode</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">except</span><span class="p">:</span>
+</span><span class='line'>            <span class="n">s</span> <span class="o">+=</span> <span class="n">b</span><span class="s">&#39;=&amp;lsquo;</span>
+</span><span class='line'>    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Invalid base32&amp;rsquo;)&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">name</span><span class="p">):</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">data</span> <span class="o">=</span> <span class="n">decode_b32</span><span class="p">(</span><span class="n">b</span><span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]))</span>
+</span><span class='line'><span class="p">(</span><span class="n">conn_id</span><span class="p">,</span> <span class="n">seq</span><span class="p">,</span> <span class="n">ack</span><span class="p">)</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s">&#39;&amp;lt;HHH&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">[:</span><span class="mi">6</span><span class="p">])</span>
+</span><span class='line'><span class="k">return</span> <span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="mi">6</span><span class="p">:])</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+</span><span class='line'>    <span class="k">global</span> <span class="n">sseq</span><span class="p">,</span> <span class="n">dseq</span>
+</span><span class='line'>    <span class="p">(</span><span class="n">seq</span><span class="p">,</span><span class="n">data</span><span class="p">)</span> <span class="o">=</span> <span class="n">parse</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="c"># remove empty packets</span>
+</span><span class='line'><span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span><span class='line'>    <span class="k">return</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#remove duplicates</span>
+</span><span class='line'><span class="k">if</span> <span class="n">port</span> <span class="o">==</span> <span class="mi">53</span><span class="p">:</span>
+</span><span class='line'>    <span class="k">if</span> <span class="n">sseq</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">seq</span><span class="p">:</span>
+</span><span class='line'>        <span class="n">sseq</span> <span class="o">=</span> <span class="n">seq</span>
+</span><span class='line'>    <span class="k">else</span><span class="p">:</span>
+</span><span class='line'>        <span class="k">return</span>
+</span><span class='line'><span class="k">else</span><span class="p">:</span>
+</span><span class='line'>    <span class="k">if</span> <span class="n">dseq</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="n">seq</span><span class="p">:</span>
+</span><span class='line'>        <span class="n">dseq</span> <span class="o">=</span> <span class="n">seq</span>
+</span><span class='line'>    <span class="k">else</span><span class="p">:</span>
+</span><span class='line'>        <span class="k">return</span>
+</span><span class='line'><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">for</span> <span class="n">ts</span><span class="p">,</span> <span class="n">pkt</span> <span class="ow">in</span> <span class="n">dpkt</span><span class="o">.</span><span class="n">pcap</span><span class="o">.</span><span class="n">Reader</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="o">&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">dump</span><span class="o">.</span><span class="n">pcap</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;,</span><span class="o">&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">r</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;)):</span>
+</span><span class='line'>    <span class="n">eth</span> <span class="o">=</span> <span class="n">dpkt</span><span class="o">.</span><span class="n">ethernet</span><span class="o">.</span><span class="n">Ethernet</span><span class="p">(</span><span class="n">pkt</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">if</span> <span class="n">eth</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">dpkt</span><span class="o">.</span><span class="n">ethernet</span><span class="o">.</span><span class="n">ETH_TYPE_IP</span><span class="p">:</span>
+</span><span class='line'>        <span class="n">ip</span> <span class="o">=</span> <span class="n">eth</span><span class="o">.</span><span class="n">data</span>
+</span><span class='line'>        <span class="k">if</span> <span class="n">ip</span><span class="o">.</span><span class="n">p</span> <span class="o">==</span> <span class="n">dpkt</span><span class="o">.</span><span class="n">ip</span><span class="o">.</span><span class="n">IP_PROTO_UDP</span><span class="p">:</span>
+</span><span class='line'>            <span class="n">udp</span> <span class="o">=</span> <span class="n">ip</span><span class="o">.</span><span class="n">data</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span>        <span class="n">dns</span> <span class="o">=</span> <span class="n">dpkt</span><span class="o">.</span><span class="n">dns</span><span class="o">.</span><span class="n">DNS</span><span class="p">(</span><span class="n">udp</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">if</span> <span class="n">udp</span><span class="o">.</span><span class="n">sport</span> <span class="o">==</span> <span class="mi">53</span><span class="p">:</span>
+</span><span class='line'>            <span class="k">for</span> <span class="n">rr</span> <span class="ow">in</span> <span class="n">dns</span><span class="o">.</span><span class="n">an</span><span class="p">:</span>
+</span><span class='line'>                <span class="k">if</span> <span class="n">rr</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">dpkt</span><span class="o">.</span><span class="n">dns</span><span class="o">.</span><span class="n">DNS_CNAME</span><span class="p">:</span>
+</span><span class='line'>                    <span class="n">handle</span><span class="p">(</span><span class="n">rr</span><span class="o">.</span><span class="n">cname</span><span class="p">,</span> <span class="n">udp</span><span class="o">.</span><span class="n">sport</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">else</span><span class="p">:</span>
+</span><span class='line'>            <span class="k">if</span> <span class="n">dns</span><span class="o">.</span><span class="n">opcode</span> <span class="o">==</span> <span class="n">dpkt</span><span class="o">.</span><span class="n">dns</span><span class="o">.</span><span class="n">DNS_QUERY</span><span class="p">:</span>
+</span><span class='line'>                <span class="n">handle</span><span class="p">(</span><span class="n">dns</span><span class="o">.</span><span class="n">qd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">udp</span><span class="o">.</span><span class="n">sport</span><span class="p">)</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>Jalankan script dengan python decode.py > output.bin</p>
+
+<p>Sekarang saatnya mendecrypt dokumen .</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>root@kali:/33c3/exfil# gpg &ndash;import key.txt
+</span><span class='line'>gpg: key D43CC062D0D8161F: public key &ldquo;operator from hell &lt;a href="&#109;&#x61;&#105;&#x6c;&#116;&#x6f;&#x3a;&#x74;&#x65;&#97;&#109;&#x40;&#x6b;&#x69;&#116;&#x63;&#x74;&#102;&#46;&#x64;&#101;">&#116;&#101;&#97;&#109;&#x40;&#107;&#x69;&#x74;&#99;&#x74;&#102;&#x2e;&#x64;&#x65;&lt;/a>&rdquo; imported
+</span><span class='line'>gpg: key D43CC062D0D8161F: &ldquo;operator from hell &lt;a href="&#109;&#x61;&#105;&#x6c;&#116;&#111;&#x3a;&#116;&#x65;&#x61;&#109;&#64;&#107;&#x69;&#116;&#x63;&#x74;&#x66;&#x2e;&#x64;&#x65;">&#116;&#x65;&#97;&#109;&#x40;&#x6b;&#105;&#116;&#x63;&#x74;&#102;&#46;&#x64;&#x65;&lt;/a>&rdquo; not changed
+</span><span class='line'>gpg: key D43CC062D0D8161F: secret key imported
+</span><span class='line'>gpg: Total number processed: 2
+</span><span class='line'>gpg:               imported: 1
+</span><span class='line'>gpg:              unchanged: 1
+</span><span class='line'>gpg:       secret keys read: 1
+</span><span class='line'>gpg:   secret keys imported: 1&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;p>root@kali:/33c3/exfil# gpg &ndash;decrypt &ndash;recipient &lt;a href="&#109;&#x61;&#x69;&#108;&#x74;&#111;&#x3a;&#x74;&#101;&#97;&#109;&#x40;&#x6b;&#x69;&#116;&#99;&#116;&#x66;&#x2e;&#100;&#x65;">&#116;&#x65;&#x61;&#109;&#64;&#107;&#x69;&#116;&#x63;&#116;&#x66;&#46;&#x64;&#x65;&lt;/a> &ndash;trust-model always secret.docx.gpg > secret.docx
+</span><span class='line'>gpg: encrypted with 2048-bit RSA key, ID 4C2B141BBF30A26A, created 2016-12-11
+</span><span class='line'>      &ldquo;operator from hell &lt;a href="&#x6d;&#x61;&#105;&#x6c;&#x74;&#111;&#x3a;&#116;&#x65;&#97;&#x6d;&#x40;&#107;&#105;&#116;&#99;&#x74;&#102;&#x2e;&#100;&#x65;">&#116;&#101;&#97;&#109;&#x40;&#107;&#x69;&#x74;&#99;&#x74;&#x66;&#x2e;&#x64;&#101;&lt;/a>&rdquo;&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;p></span></code></pre></td></tr></table></div></figure></p>
+
+<p>Kemudian kita buka file secret.docx dan ditemukan flagnya</p>
+
+<blockquote><p>The secret codeword is
+33C3_g00d_d1s3ct1on_sk1llz_h0mie</p></blockquote>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Write Up (3DSCTF) 2016 : Hot Sun ?]]></title>
