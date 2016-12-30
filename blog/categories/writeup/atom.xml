@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Writeup | Rackel-noobs Labs]]></title>
   <link href="http://rackel-noobs.github.io/blog/categories/writeup/atom.xml" rel="self"/>
   <link href="http://rackel-noobs.github.io/"/>
-  <updated>2016-12-30T08:15:02+07:00</updated>
+  <updated>2016-12-30T08:22:05+07:00</updated>
   <id>http://rackel-noobs.github.io/</id>
   <author>
     <name><![CDATA[Rackel]]></name>
@@ -35,9 +35,9 @@ Can you help?</p></blockquote>
 
 <p>Setiap payload dikodekan dalam Base32 dan dibagi menjadi potongan 62-karakter untuk menjelaskan panjang maksimum nama domain. Potongan dipisahkan dengan periode dan akhiran eat-sleep-pwn-repeat.de</p>
 
-<blockquote><p>G4JQAAADAB2WSZB5GEYDAMJIMZYGK5DSPEUSAZ3JMQ6TCMBQGEUGM4DFORZHSK"JAM5ZG65LQOM6TCMBQGEUGM4DFORZHSKIKeat-sleep-pwn-repeatde</p></blockquote>
-
-<p>Berdasarkan informasi yang dikumpulkan sejauh ini kita harus membuat script. Script ini akan melalui semua paket dalam file PCAP, mengekstraknya dan mendecode payloads, membuang paket duplikat, dan menampilkan output ke layar:</p>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>G4JQAAADAB2WSZB5GEYDAMJIMZYGK5DSPEUSAZ3JMQ6TCMBQGEUGM4DFORZHSK"JAM5ZG65LQOM6TCMBQGEUGM4DFORZHSKIKeat-sleep-pwn-repeatde</span></code></pre></td></tr></table></div></figure>
+Berdasarkan informasi yang dikumpulkan sejauh ini kita harus membuat script. Script ini akan melalui semua paket dalam file PCAP, mengekstraknya dan mendecode payloads, membuang paket duplikat, dan menampilkan output ke layar:</p>
 
 <p><figure class='code'><figcaption><span>Time to Decode - decode.py </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -194,8 +194,8 @@ Can you help?</p></blockquote>
 <span class='line-number'>14</span>
 <span class='line-number'>15</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>root@kali:/33c3/exfil# gpg &ndash;import key.txt
-</span><span class='line'>gpg: key D43CC062D0D8161F: public key &ldquo;operator from hell &lt;a href="&#109;&#x61;&#105;&#x6c;&#116;&#x6f;&#x3a;&#x74;&#x65;&#97;&#109;&#x40;&#x6b;&#x69;&#116;&#x63;&#x74;&#102;&#46;&#x64;&#101;">&#116;&#101;&#97;&#109;&#x40;&#107;&#x69;&#x74;&#99;&#x74;&#102;&#x2e;&#x64;&#x65;&lt;/a>&rdquo; imported
-</span><span class='line'>gpg: key D43CC062D0D8161F: &ldquo;operator from hell &lt;a href="&#109;&#x61;&#105;&#x6c;&#116;&#111;&#x3a;&#116;&#x65;&#x61;&#109;&#64;&#107;&#x69;&#116;&#x63;&#x74;&#x66;&#x2e;&#x64;&#x65;">&#116;&#x65;&#97;&#109;&#x40;&#x6b;&#105;&#116;&#x63;&#x74;&#102;&#46;&#x64;&#x65;&lt;/a>&rdquo; not changed
+</span><span class='line'>gpg: key D43CC062D0D8161F: public key &ldquo;operator from hell &lt;a href="&#x6d;&#97;&#105;&#x6c;&#x74;&#111;&#x3a;&#116;&#x65;&#x61;&#x6d;&#x40;&#x6b;&#x69;&#x74;&#x63;&#116;&#x66;&#46;&#x64;&#101;">&#x74;&#x65;&#97;&#x6d;&#64;&#107;&#x69;&#116;&#99;&#x74;&#x66;&#46;&#x64;&#x65;&lt;/a>&rdquo; imported
+</span><span class='line'>gpg: key D43CC062D0D8161F: &ldquo;operator from hell &lt;a href="&#x6d;&#x61;&#105;&#108;&#116;&#x6f;&#x3a;&#x74;&#101;&#97;&#x6d;&#x40;&#x6b;&#105;&#x74;&#99;&#116;&#102;&#x2e;&#100;&#101;">&#116;&#x65;&#x61;&#109;&#x40;&#107;&#x69;&#x74;&#x63;&#116;&#102;&#x2e;&#x64;&#101;&lt;/a>&rdquo; not changed
 </span><span class='line'>gpg: key D43CC062D0D8161F: secret key imported
 </span><span class='line'>gpg: Total number processed: 2
 </span><span class='line'>gpg:               imported: 1
@@ -203,9 +203,9 @@ Can you help?</p></blockquote>
 </span><span class='line'>gpg:       secret keys read: 1
 </span><span class='line'>gpg:   secret keys imported: 1&lt;/p>
 </span><span class='line'>
-</span><span class='line'>&lt;p>root@kali:/33c3/exfil# gpg &ndash;decrypt &ndash;recipient &lt;a href="&#109;&#x61;&#x69;&#108;&#x74;&#111;&#x3a;&#x74;&#101;&#97;&#109;&#x40;&#x6b;&#x69;&#116;&#99;&#116;&#x66;&#x2e;&#100;&#x65;">&#116;&#x65;&#x61;&#109;&#64;&#107;&#x69;&#116;&#x63;&#116;&#x66;&#46;&#x64;&#x65;&lt;/a> &ndash;trust-model always secret.docx.gpg > secret.docx
+</span><span class='line'>&lt;p>root@kali:/33c3/exfil# gpg &ndash;decrypt &ndash;recipient &lt;a href="&#x6d;&#97;&#105;&#x6c;&#x74;&#111;&#58;&#116;&#x65;&#97;&#109;&#x40;&#107;&#105;&#x74;&#99;&#116;&#x66;&#x2e;&#x64;&#x65;">&#116;&#x65;&#97;&#x6d;&#x40;&#x6b;&#105;&#116;&#99;&#116;&#x66;&#46;&#100;&#101;&lt;/a> &ndash;trust-model always secret.docx.gpg > secret.docx
 </span><span class='line'>gpg: encrypted with 2048-bit RSA key, ID 4C2B141BBF30A26A, created 2016-12-11
-</span><span class='line'>      &ldquo;operator from hell &lt;a href="&#x6d;&#x61;&#105;&#x6c;&#x74;&#111;&#x3a;&#116;&#x65;&#97;&#x6d;&#x40;&#107;&#105;&#116;&#99;&#x74;&#102;&#x2e;&#100;&#x65;">&#116;&#101;&#97;&#109;&#x40;&#107;&#x69;&#x74;&#99;&#x74;&#x66;&#x2e;&#x64;&#101;&lt;/a>&rdquo;&lt;/p>
+</span><span class='line'>      &ldquo;operator from hell &lt;a href="&#x6d;&#x61;&#105;&#108;&#116;&#111;&#58;&#116;&#101;&#97;&#x6d;&#x40;&#x6b;&#105;&#116;&#99;&#x74;&#x66;&#46;&#x64;&#101;">&#x74;&#101;&#97;&#x6d;&#64;&#x6b;&#105;&#x74;&#x63;&#x74;&#102;&#46;&#x64;&#101;&lt;/a>&rdquo;&lt;/p>
 </span><span class='line'>
 </span><span class='line'>&lt;p></span></code></pre></td></tr></table></div></figure></p>
 

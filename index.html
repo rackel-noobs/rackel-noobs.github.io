@@ -104,7 +104,9 @@ Can you help?</p></blockquote>
 
 <p>Setiap payload dikodekan dalam Base32 dan dibagi menjadi potongan 62-karakter untuk menjelaskan panjang maksimum nama domain. Potongan dipisahkan dengan periode dan akhiran eat-sleep-pwn-repeat.de</p>
 
-<blockquote><p>G4JQAAADAB2WSZB5GEYDAMJIMZYGK5DSPEUSAZ3JMQ6TCMBQGEUGM4DFORZHSK"JAM5ZG65LQOM6TCMBQGEUGM4DFORZHSKIKeat-sleep-pwn-repeatde</p></blockquote>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>G4JQAAADAB2WSZB5GEYDAMJIMZYGK5DSPEUSAZ3JMQ6TCMBQGEUGM4DFORZHSK"JAM5ZG65LQOM6TCMBQGEUGM4DFORZHSKIKeat-sleep-pwn-repeatde</span></code></pre></td></tr></table></div></figure>
+
 
 <p>Berdasarkan informasi yang dikumpulkan sejauh ini kita harus membuat script. Script ini akan melalui semua paket dalam file PCAP, mengekstraknya dan mendecode payloads, membuang paket duplikat, dan menampilkan output ke layar:</p>
 
